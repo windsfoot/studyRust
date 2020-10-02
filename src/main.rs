@@ -32,7 +32,7 @@ use serde::{Serialize, Deserialize};
 async fn main() {
     let paths = vec![
 
-        "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=40&sort=symbol&asc=1&node=cyb&_s_r_a=init".to_string(),
+        "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=90&sort=symbol&asc=1&node=cyb&_s_r_a=init".to_string(),
     ];
     let fetches = futures::stream::iter(paths.into_iter().map(|path| async move {
         match reqwest::get(&path).await {
