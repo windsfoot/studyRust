@@ -1,12 +1,23 @@
+mod sina;
+
+
+
+
+use crate::sina::sina::HttpAdress;
 use futures;
 use futures::future;
 use futures::stream::{self, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json;
 
+
+
 #[tokio::main]
 async fn main() {
-    let aa = format!("http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page={}&num=80&sort=symbol&asc=1&node=cyb&_s_r_a=init", 1);
+    let mut c:HttpAdress=HttpAdress{dress:String::from("")};
+    c.set_dress(1,10,"cyb");
+
+    let aa =String::from( c.get());
     let paths = vec![aa];
     let fetches = futures::stream::iter(paths.into_iter().map(|path| async move {
         match reqwest::get(&path).await {
@@ -34,4 +45,6 @@ async fn main() {
     .collect::<Vec<()>>();
     println!("Waiting...");
     fetches.await;
+
+    
 }
