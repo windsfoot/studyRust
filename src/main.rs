@@ -16,7 +16,6 @@ use serde_json;
 async fn main() {
     let mut c:HttpAdress=HttpAdress{dress:String::from("")};
     c.set_dress(1,10,"cyb");
-
     let aa =String::from( c.get());
     let paths = vec![aa];
     let fetches = futures::stream::iter(paths.into_iter().map(|path| async move {
