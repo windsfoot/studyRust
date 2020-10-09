@@ -41,7 +41,6 @@ pub mod sina {
                     }
                     Err(_) => println!("ERROR reading {}", s),
                 },
-               
                 Err(_) => println!("ERROR downloading {}", s),
             }
         }
