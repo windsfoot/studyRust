@@ -33,7 +33,7 @@ pub mod sina {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => {
                         
-                        let v: Vec<serde_json::Value> = serde_json::from_str(&text).unwrap();
+                        let v: Vec<serde_json::Value> = serde_json::from_str(&text).expect(&text);
                         
                         println!("{:?}",v.len());
                        // self.symbol.push(String::from("Start"));
@@ -53,9 +53,10 @@ pub mod sina {
         pub async  fn get_total_symbol(&mut self){
             for i in &MKT{
                 let mut j=1;
-                while j<100{
+                while j<70{
                     let  s: String= self.set_dress(j, symVol, i);
                     self.get_symbol(s).await;
+                    
                     j=j+1;
                 }
             }
