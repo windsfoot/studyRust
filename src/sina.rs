@@ -20,7 +20,7 @@ pub mod sina {
             };
         }
         //抓取代码的链接控制
-        pub fn set_dress(&mut self, x: i32, y: i32, z: &str) -> String {
+        pub fn set_dress(&mut self, x: i32,  y: i32, z: &str) -> String {
             return format!("http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page={}&num={}&sort=symbol&asc=1&node={}&_s_r_a=init",x,y,z);
         }
         //抓取代码表
@@ -29,7 +29,10 @@ pub mod sina {
             match reqwest::get(&s).await {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => {
+                        
                         let v: Vec<serde_json::Value> = serde_json::from_str(&text).unwrap();
+                        
+                        println!("{:?}",v.len());
                         self.symbol.push(String::from("Start"));
                         for i in v {
                             if let Some(k) = i.get("symbol") {
@@ -44,6 +47,16 @@ pub mod sina {
                 Err(_) => println!("ERROR downloading {}", s),
             }
         }
+        pub fn get_total_symbol(&mut self){
+            for i in &self.mkt{
+                let mut j=1;
+                while j!=0{
+                    let  s= &self.set_dress(1, 80, i);
+                    j=j+1;
+                }
+            }
+        }
+
     }
 
     //定义新浪行情数据

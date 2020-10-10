@@ -22,6 +22,7 @@ async fn main() {
    let future=c.get_symbol();
    block_on(future);
    println!("{:?}",c.symbol);
+   c.get_total_symbol();
 
     
 }
