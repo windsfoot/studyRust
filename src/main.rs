@@ -17,12 +17,10 @@ use serde_json;
 async fn main() {
     let mut c:Sina=Sina::new();
  
-   let cc=c.set_dress(1, 10, c.mkt[0]);
-   println!("{:?}",cc);
-   let future=c.get_symbol();
-   block_on(future);
+  
+   let future=c.get_total_symbol().await;
+   
    println!("{:?}",c.symbol);
-   c.get_total_symbol();
 
     
 }

@@ -2,38 +2,41 @@ use futures;
 use reqwest;
 //从新浪获取行情数据
 pub mod sina {
-    //新浪行情网址
-    pub struct Sina<'a> {
+    //常量
+    const mkt: [&str; 3]=["hs_a","cyb","kcb"];//定义市场名称
+    const symVol: u32=80;
+
+    //新浪行情结构
+    pub struct Sina {
         pub symbol: Vec<String>,
-        pub mkt: [&'a str; 4],
     }
 
     //找到解答，解决字符串参数格式化的方法：
     //1.定义一个小函数
     //2.定义一个宏  eg：macro_rules! hello {() => ("hello")};println!(hello!());
     //
-    impl Sina<'_> {
+    impl Sina {
         pub fn new() -> Self {
             return Sina {
-                mkt: ["sh", "sz", "cyb", "kcb"],
                 symbol: vec![],
             };
         }
+
         //抓取代码的链接控制
-        pub fn set_dress(&mut self, x: i32,  y: i32, z: &str) -> String {
+        pub fn set_dress(&mut self, x: i32,  y: u32, z: &str) -> String {
             return format!("http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page={}&num={}&sort=symbol&asc=1&node={}&_s_r_a=init",x,y,z);
         }
         //抓取代码表
-        pub async fn get_symbol(&mut self) {
-            let s: String = self.set_dress(100, 60, "cyb");
-            match reqwest::get(&s).await {
+         async fn get_symbol(&mut self,dress:String) {
+            
+            match reqwest::get(&dress).await {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => {
                         
                         let v: Vec<serde_json::Value> = serde_json::from_str(&text).unwrap();
                         
                         println!("{:?}",v.len());
-                        self.symbol.push(String::from("Start"));
+                       // self.symbol.push(String::from("Start"));
                         for i in v {
                             if let Some(k) = i.get("symbol") {
                                 if let serde_json::Value::String(j) = k {
@@ -42,16 +45,17 @@ pub mod sina {
                             }
                         }
                     }
-                    Err(_) => println!("ERROR reading {}", s),
+                    Err(_) => println!("ERROR reading {}", dress),
                 },
-                Err(_) => println!("ERROR downloading {}", s),
+                Err(_) => println!("ERROR downloading {}", dress),
             }
         }
-        pub fn get_total_symbol(&mut self){
-            for i in &self.mkt{
+        pub async  fn get_total_symbol(&mut self){
+            for i in &mkt{
                 let mut j=1;
-                while j!=0{
-                    let  s= &self.set_dress(1, 80, i);
+                while j<10{
+                    let  s: String= self.set_dress(j, symVol, i);
+                    futures::join!(self.get_symbol(s));
                     j=j+1;
                 }
             }
