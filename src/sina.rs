@@ -3,7 +3,7 @@ use reqwest;
 //从新浪获取行情数据
 pub mod sina {
     //常量
-    const mkt: [&str; 3]=["hs_a","cyb","kcb"];//定义市场名称
+    const MKT: [&str; 1]=["hs_a"];//["hs_a","cyb","kcb"];//定义市场名称
     const symVol: u32=80;
 
     //新浪行情结构
@@ -51,11 +51,11 @@ pub mod sina {
             }
         }
         pub async  fn get_total_symbol(&mut self){
-            for i in &mkt{
+            for i in &MKT{
                 let mut j=1;
-                while j<10{
+                while j<100{
                     let  s: String= self.set_dress(j, symVol, i);
-                    futures::join!(self.get_symbol(s));
+                    self.get_symbol(s).await;
                     j=j+1;
                 }
             }
