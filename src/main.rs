@@ -20,7 +20,7 @@ async fn main() {
   
    let future=c.get_total_symbol().await;
    
-   println!("{:?}",c.symbol);
+   println!("{:?}\n{:?}",c.symbol,c.symbol.len());
 
     
 }
