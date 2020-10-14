@@ -18,8 +18,8 @@ async fn main() {
     let mut c:Sina=Sina::new();
  
   
-   let future=c.get_total_symbol().await;
-   
+   let future=c.get_total_symbol();
+block_on(future);   
    println!("{:?}\n{:?}",c.symbol,c.symbol.len());
 
     
