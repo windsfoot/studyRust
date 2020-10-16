@@ -1,6 +1,6 @@
 use futures;
 use reqwest;
-use thread;
+
 //从新浪获取行情数据
 pub mod sina {
     //常量
@@ -35,7 +35,7 @@ pub mod sina {
                         for i in v {
                             if let Some(k) = i.get("symbol") {
                                 if let serde_json::Value::String(j) = k {
-                                    thread::sleep(time::Duration::from_secs(wait_time));
+                                   // thread::sleep(time::Duration::from_secs(wait_time));
                                     self.symbol.push(j.to_string());
                                 }
                             }
@@ -49,7 +49,12 @@ pub mod sina {
         pub async fn get_total_symbol(&mut self) {
             for i in &MKT {
                 let mut j = 1;
-                while j < 35 {
+                let max:i32;
+                match i{
+                    &"hs_a"=>max=16,
+                    _=>max=0
+                }
+                while j < max {
                     let s: String = self.set_dress(j, SYM_VOL, i);
                     futures::join!( self.get_symbol(s));
 
