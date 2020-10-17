@@ -14,11 +14,11 @@ use std::time;
 async fn main() {
    let mut c: Sina = Sina::new();
 
-   for _ in 1..5 {
+  // for _ in 1..5 {
       c.get_total_symbol().await;
       println!("{:?}\n{:?}", c.symbol, c.symbol.len());
       thread::sleep(time::Duration::from_secs(3));
-   }
+  // }
    //  let future=c.get_total_symbol().await;
    //block_on(future);
    println!("{:?}\n{:?}", c.symbol, c.symbol.len());

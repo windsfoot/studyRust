@@ -5,7 +5,7 @@ use reqwest;
 pub mod sina {
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
-    const SYM_VOL: u32 = 80;
+    const SYM_VOL: u32 = 100;
 
     //新浪行情结构
     pub struct Sina {
@@ -51,7 +51,7 @@ pub mod sina {
                 let mut j = 1;
                 let max:i32;
                 match i{
-                    &"hs_a"=>max=16,
+                    &"hs_a"=>max=42,
                     _=>max=0
                 }
                 while j < max {
