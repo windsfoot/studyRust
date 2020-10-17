@@ -68,37 +68,33 @@ pub mod sina {
         }
 
         //抓取实时行情
-        pub async fn get_real_q(&mut self, r_dress: String) {
+        pub async fn get_real_q(&mut self, r_dress: &str) {
             println!("{:?}", r_dress);
-            match reqwest::get(&r_dress).await {
+            match reqwest::get(r_dress).await {
                 Ok(resp) => match resp.text().await {
-                    Ok(text) => {
-                        if let Some(t1) = text.get(21..text.len() - 4) {
-                            let t2: Vec<String> =
-                                t1.split(",").map(|x| x.parse().unwrap()).collect();
-                            println!(" {:?}", t2);
-                        }
-                    }
+                    Ok(text) => println!(" {:?}", text),
                     Err(_) => println!("ERROR reading {}", r_dress),
                 },
                 Err(_) => println!("ERROR downloading {}", r_dress),
             }
         }
-     pub   fn make_dress(&self)->Vec<String> {
+        pub fn make_dress(&self) -> Vec<String> {
             let i: usize = self.symbol.len();
-            let mut  r_dress: Vec<String>=Vec::new();
-            let mut j: usize = 0;  //总计数
+            let mut r_dress: Vec<String> = Vec::new();
+            let mut j: usize = 0; //总计数
             let mut k: usize = 0; //列计数
             while j < i {
-                let mut tm:String=R_QUA.to_string();
-                
+                let mut tm: String = R_QUA.to_string();
                 for _ in 0..MAX_QUA {
-                    tm =tm+&self.symbol[j];
-                    j=j+1;
-                    if j==i {break;}
+                    tm = tm + &self.symbol[j];
+                    j = j + 1;
+                    if j == i {
+                        break;
+                    }
+                    tm = tm + ",";
                 }
                 r_dress.push(tm);
-                k=k+1;
+                k = k + 1;
             }
             return r_dress;
         }

@@ -18,5 +18,5 @@ async fn main() {
     println!("{:?}\n{:?}", c.symbol, c.symbol.len());
     thread::sleep(time::Duration::from_secs(3));
     let p=c.make_dress();
-    println!("{:?}",p);
+    c.get_real_q(&p[0]).await;
 }
