@@ -9,6 +9,7 @@ pub mod sina {
     const MAX_A: i32 = 42; //全A页数
     const R_QUA: &str = "http://hq.sinajs.cn/list=";
     //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
+    const MAX_QUA: usize = 63; //实时行情单次最大股票数量
 
     //新浪行情结构
     pub struct Sina {
@@ -66,31 +67,40 @@ pub mod sina {
             }
         }
 
-        //抓取事实行情
-        pub async fn get_real_q(&mut self) {
-            let r_dress = String::from(R_QUA) + &self.symbol[0];
+        //抓取实时行情
+        pub async fn get_real_q(&mut self, r_dress: String) {
             println!("{:?}", r_dress);
             match reqwest::get(&r_dress).await {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => {
-                        if let Some(t1) = text.get(21..text.len()-4) {
-                            let t2: Vec<String>=t1.split(",").map(|x| x.parse().unwrap()).collect();
-                            println!("{:?}", t2);
+                        if let Some(t1) = text.get(21..text.len() - 4) {
+                            let t2: Vec<String> =
+                                t1.split(",").map(|x| x.parse().unwrap()).collect();
+                            println!(" {:?}", t2);
                         }
-                        // let v: Vec<serde_json::Value> = serde_json::from_str(&text).expect(&text);
-                        // for i in v {
-                        //     if let Some(k) = i.get("symbol") {
-                        //         if let serde_json::Value::String(j) = k {
-                        //
-                        //             self.symbol.push(j.to_string());
-                        //        }
-                        //     }
-                        // }
                     }
                     Err(_) => println!("ERROR reading {}", r_dress),
                 },
                 Err(_) => println!("ERROR downloading {}", r_dress),
             }
+        }
+     pub   fn make_dress(&self)->Vec<String> {
+            let i: usize = self.symbol.len();
+            let mut  r_dress: Vec<String>=Vec::new();
+            let mut j: usize = 0;  //总计数
+            let mut k: usize = 0; //列计数
+            while j < i {
+                let mut tm:String=R_QUA.to_string();
+                
+                for _ in 0..MAX_QUA {
+                    tm =tm+&self.symbol[j];
+                    j=j+1;
+                    if j==i {break;}
+                }
+                r_dress.push(tm);
+                k=k+1;
+            }
+            return r_dress;
         }
     }
 

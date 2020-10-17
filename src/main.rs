@@ -17,5 +17,6 @@ async fn main() {
     c.get_total_symbol().await;
     println!("{:?}\n{:?}", c.symbol, c.symbol.len());
     thread::sleep(time::Duration::from_secs(3));
-    c.get_real_q().await;
+    let p=c.make_dress();
+    println!("{:?}",p);
 }
