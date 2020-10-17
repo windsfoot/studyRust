@@ -7,6 +7,8 @@ pub mod sina {
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
     const SYM_VOL: u32 = 100; //全A单页股票个数
     const MAX_A: i32 = 42; //全A页数
+    const R_QUA: &str = "http://hq.sinajs.cn/list=";
+    //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
 
     //新浪行情结构
     pub struct Sina {
@@ -32,11 +34,9 @@ pub mod sina {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => {
                         let v: Vec<serde_json::Value> = serde_json::from_str(&text).expect(&text);
-                        // self.symbol.push(String::from("Start"));
                         for i in v {
                             if let Some(k) = i.get("symbol") {
                                 if let serde_json::Value::String(j) = k {
-                                    // thread::sleep(time::Duration::from_secs(wait_time));
                                     self.symbol.push(j.to_string());
                                 }
                             }
@@ -53,15 +53,42 @@ pub mod sina {
             for i in &MKT {
                 let mut j = 1;
                 match i {
-                    &"hs_a" => {              //处理A股代码
+                    &"hs_a" => {
+                        //处理A股代码
                         while j < MAX_A {
                             let s: String = self.set_dress(j, SYM_VOL, i);
                             futures::join!(self.get_symbol(s));
                             j = j + 1;
                         }
                     }
-                    _=>{}
+                    _ => {}
                 }
+            }
+        }
+
+        //抓取事实行情
+        pub async fn get_real_q(&mut self) {
+            let r_dress = String::from(R_QUA) + &self.symbol[0];
+            println!("{:?}", r_dress);
+            match reqwest::get(&r_dress).await {
+                Ok(resp) => match resp.text().await {
+                    Ok(text) => {
+                        if let Some(t1) = text.get(21..text.len()-4) {
+                            println!("{:?}", t1);
+                        }
+                        // let v: Vec<serde_json::Value> = serde_json::from_str(&text).expect(&text);
+                        // for i in v {
+                        //     if let Some(k) = i.get("symbol") {
+                        //         if let serde_json::Value::String(j) = k {
+                        //
+                        //             self.symbol.push(j.to_string());
+                        //        }
+                        //     }
+                        // }
+                    }
+                    Err(_) => println!("ERROR reading {}", r_dress),
+                },
+                Err(_) => println!("ERROR downloading {}", r_dress),
             }
         }
     }
