@@ -74,7 +74,8 @@ pub mod sina {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => {
                         if let Some(t1) = text.get(21..text.len()-4) {
-                            println!("{:?}", t1);
+                            let t2: Vec<String>=t1.split(",").map(|x| x.parse().unwrap()).collect();
+                            println!("{:?}", t2);
                         }
                         // let v: Vec<serde_json::Value> = serde_json::from_str(&text).expect(&text);
                         // for i in v {
