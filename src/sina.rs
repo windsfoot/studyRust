@@ -69,7 +69,6 @@ pub mod sina {
 
         //抓取实时行情
         pub async fn get_real_q(&mut self, r_dress: &str) {
-            println!("{:?}", r_dress);
             match reqwest::get(r_dress).await {
                 Ok(resp) => match resp.text().await {
                     Ok(text) => println!(" {:?}", text),
