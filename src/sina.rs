@@ -5,7 +5,8 @@ use reqwest;
 pub mod sina {
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
-    const SYM_VOL: u32 = 100;
+    const SYM_VOL: u32 = 100; //全A单页股票个数
+    const MAX_A: i32 = 42; //全A页数
 
     //新浪行情结构
     pub struct Sina {
@@ -35,7 +36,7 @@ pub mod sina {
                         for i in v {
                             if let Some(k) = i.get("symbol") {
                                 if let serde_json::Value::String(j) = k {
-                                   // thread::sleep(time::Duration::from_secs(wait_time));
+                                    // thread::sleep(time::Duration::from_secs(wait_time));
                                     self.symbol.push(j.to_string());
                                 }
                             }
@@ -46,19 +47,20 @@ pub mod sina {
                 Err(_) => println!("ERROR downloading {}", dress),
             }
         }
+
+        //获取全A代码
         pub async fn get_total_symbol(&mut self) {
             for i in &MKT {
                 let mut j = 1;
-                let max:i32;
-                match i{
-                    &"hs_a"=>max=42,
-                    _=>max=0
-                }
-                while j < max {
-                    let s: String = self.set_dress(j, SYM_VOL, i);
-                    futures::join!( self.get_symbol(s));
-
-                    j = j + 1;
+                match i {
+                    &"hs_a" => {              //处理A股代码
+                        while j < MAX_A {
+                            let s: String = self.set_dress(j, SYM_VOL, i);
+                            futures::join!(self.get_symbol(s));
+                            j = j + 1;
+                        }
+                    }
+                    _=>{}
                 }
             }
         }
