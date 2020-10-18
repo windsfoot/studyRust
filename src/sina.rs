@@ -1,6 +1,3 @@
-
-
-
 //从新浪获取行情数据
 pub mod sina {
     //常量
@@ -15,7 +12,6 @@ pub mod sina {
     pub struct Sina {
         pub symbol: Vec<String>,
     }
-    
     //找到解答，解决字符串参数格式化的方法：
     //1.定义一个小函数
     //2.定义一个宏  eg：macro_rules! hello {() => ("hello")};println!(hello!());
@@ -68,12 +64,15 @@ pub mod sina {
 
         //抓取实时行情
         pub async fn get_real_q(&mut self, r_dress: &str) {
-            match reqwest::get(r_dress).await {
-                Ok(resp) => match resp.text().await {
-                    Ok(text) => println!(" {:?}", text),
-                    Err(_) => println!("ERROR reading {}", r_dress),
-                },
-                Err(_) => println!("ERROR downloading {}", r_dress),
+            while true {
+                match reqwest::get(r_dress).await {
+                    Ok(resp) => match resp.text().await {
+                        Ok(text) => println!(" {:?}", text),
+                        Err(_) => println!("ERROR reading {}", r_dress),
+                    },
+                    Err(_) => println!("ERROR downloading {}", r_dress),
+                }
+                std::thread::sleep(std::time::Duration::from_secs(3));
             }
         }
         pub fn make_dress(&self) -> Vec<String> {
