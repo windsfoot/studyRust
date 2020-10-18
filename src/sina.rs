@@ -9,7 +9,7 @@ pub mod sina {
     const MAX_A: i32 = 42; //全A页数
     const R_QUA: &str = "http://hq.sinajs.cn/list=";
     //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
-    const MAX_QUA: usize = 63; //实时行情单次最大股票数量
+    const MAX_QUA: usize = 900; //实时行情单次最大股票数量
 
     //新浪行情结构
     pub struct Sina {

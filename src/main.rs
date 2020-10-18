@@ -19,6 +19,7 @@ async fn main() {
     let p=c.make_dress();
     for i in p{
         c.get_real_q(&i).await;
+      
     }
     
 }
