@@ -1,5 +1,9 @@
 //从新浪获取行情数据
+
 pub mod sina {
+    use futures;
+    use futures::future;
+    use futures::stream::{self, StreamExt};
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
     const SYM_VOL: u32 = 100; //全A单页股票个数
@@ -63,9 +67,9 @@ pub mod sina {
         }
 
         //抓取实时行情
-        pub async fn get_real_q(&mut self, r_dress: &str) {
+        pub async fn get_real_q(&self, r_dress: String) {
             while true {
-                match reqwest::get(r_dress).await {
+                match reqwest::get(&r_dress).await {
                     Ok(resp) => match resp.text().await {
                         Ok(text) => println!(" {:?}", text),
                         Err(_) => println!("ERROR reading {}", r_dress),
@@ -94,6 +98,15 @@ pub mod sina {
                 k = k + 1;
             }
             return r_dress;
+        }
+        pub async fn get_total_real_q(&self) {
+            let p = self.make_dress();
+
+            future::join_all(p.into_iter().map(|dress| async {
+                self.get_real_q(dress);
+            })).await;
+
+            println!("wait!\n");
         }
     }
 

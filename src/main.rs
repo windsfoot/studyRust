@@ -1,6 +1,5 @@
 mod sina;
 
-
 use crate::sina::sina::Sina;
 use futures;
 use futures::future;
@@ -13,12 +12,7 @@ use std::time;
 #[tokio::main]
 async fn main() {
     let mut c: Sina = Sina::new();
-
     c.get_total_symbol().await;
-    thread::sleep(time::Duration::from_secs(3));
-    let p=c.make_dress();
-    for i in p{
-        c.get_real_q(&i).await;  
-    }
+    c.get_total_real_q().await;
     while true{}
 }
