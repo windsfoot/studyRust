@@ -1,5 +1,5 @@
-use futures;
-use reqwest;
+
+
 
 //从新浪获取行情数据
 pub mod sina {
@@ -9,17 +9,16 @@ pub mod sina {
     const MAX_A: i32 = 42; //全A页数
     const R_QUA: &str = "http://hq.sinajs.cn/list=";
     //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
-    const MAX_QUA: usize = 900; //实时行情单次最大股票数量
+    const MAX_QUA: usize = 70; //实时行情单次最大股票数量
 
     //新浪行情结构
     pub struct Sina {
         pub symbol: Vec<String>,
     }
-
+    
     //找到解答，解决字符串参数格式化的方法：
     //1.定义一个小函数
     //2.定义一个宏  eg：macro_rules! hello {() => ("hello")};println!(hello!());
-    //
     impl Sina {
         pub fn new() -> Self {
             return Sina { symbol: vec![] };
@@ -100,26 +99,26 @@ pub mod sina {
     }
 
     //定义新浪行情数据
-    struct Symb {
-        symbol: String,
-        code: String,
-        name: String,
-        trade: f32,
-        pricechange: f32,
-        changepercent: f32,
-        buy: f32,
-        sell: f32,
-        settlement: f32,
-        open: f32,
-        high: f32,
-        low: f32,
-        volume: f64,
-        amount: f64,
-        ticktime: String,
-        per: f32,
-        pb: f32,
-        mktcap: f64,
-        nmc: f64,
-        turnoverratio: f64,
-    }
+    // // ///struct Symb {
+    // //     symbol: String,
+    // //     code: String,
+    // //     name: String,
+    // //     trade: f32,
+    // //     pricechange: f32,
+    // //     changepercent: f32,
+    // //     buy: f32,
+    // /    sell: f32,
+    //     settlement: f32,
+    //     open: f32,
+    //     high: f32,
+    //     low: f32,
+    //     volume: f64,
+    //     amount: f64,
+    //     ticktime: String,
+    //     per: f32,
+    //     pb: f32,
+    //     mktcap: f64,
+    //     nmc: f64,
+    //     turnoverratio: f64,
+    // }
 }

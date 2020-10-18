@@ -1,6 +1,6 @@
 mod sina;
 
-use crate::futures::executor::block_on;
+
 use crate::sina::sina::Sina;
 use futures;
 use futures::future;
