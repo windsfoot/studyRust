@@ -67,16 +67,13 @@ pub mod sina {
         }
 
         //抓取实时行情
-        pub async fn get_real_q(&self, r_dress: String) {
-            while true {
-                match reqwest::get(&r_dress).await {
-                    Ok(resp) => match resp.text().await {
-                        Ok(text) => println!(" {:?}", text),
-                        Err(_) => println!("ERROR reading {}", r_dress),
-                    },
-                    Err(_) => println!("ERROR downloading {}", r_dress),
-                }
-                std::thread::sleep(std::time::Duration::from_secs(3));
+        pub async fn get_real_q(&self, r_dress: &String) {
+            match reqwest::get(r_dress).await {
+                Ok(resp) => match resp.text().await {
+                    Ok(text) => println!(" {:?}", text),
+                    Err(_) => println!("ERROR reading {}", r_dress),
+                },
+                Err(_) => println!("ERROR downloading {}", r_dress),
             }
         }
         pub fn make_dress(&self) -> Vec<String> {
@@ -101,10 +98,9 @@ pub mod sina {
         }
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
-
-            future::join_all(p.into_iter().map(|dress| async {
-                self.get_real_q(dress);
-            })).await;
+            for i in p {
+                futures::join!(self.get_real_q(&i));
+            }
 
             println!("wait!\n");
         }

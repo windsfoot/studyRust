@@ -8,11 +8,14 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::thread;
 use std::time;
+use tokio::runtime::Runtime;
 
-#[tokio::main]
-async fn main() {
+ fn main() {
     let mut c: Sina = Sina::new();
-    c.get_total_symbol().await;
-    c.get_total_real_q().await;
+    let mut  r = Runtime::new().unwrap();
+   r.block_on(c.get_total_symbol());
+   println!("symbol over,{:?}",c.symbol);
+    //c.get_total_real_q().await;
+    r.block_on(c.get_total_real_q());
     while true{}
 }
