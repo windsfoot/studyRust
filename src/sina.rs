@@ -102,7 +102,7 @@ use std::time;
         }
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
-            while true {
+            loop {
                 for i in &p {
                     futures::join!(self.get_real_q(&i));
                     std::thread::sleep(time::Duration::from_secs(1));
