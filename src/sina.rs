@@ -1,12 +1,8 @@
 //从新浪获取行情数据
-
 pub mod sina {
     use futures;
-    use futures::future;
-    use futures::stream::{self, StreamExt};
+    use std::time;
 
-use std::time;
-    
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
     const SYM_VOL: u32 = 100; //全A单页股票个数
@@ -73,7 +69,7 @@ use std::time;
         pub async fn get_real_q(&self, r_dress: &String) {
             match reqwest::get(r_dress).await {
                 Ok(resp) => match resp.text().await {
-                    Ok(text) => println!(" {:?}", text),
+                    Ok(text) => self.to_symb(text),
                     Err(_) => println!("ERROR reading {}", r_dress),
                 },
                 Err(_) => println!("ERROR downloading {}", r_dress),
@@ -108,7 +104,12 @@ use std::time;
                     std::thread::sleep(time::Duration::from_secs(1));
                 }
             }
-            println!("wait!\n");
+        }
+        pub fn to_symb(&self, text: String) {
+            let v_text:Vec<&str> = text.split("\";\n").collect();
+            for i in v_text {
+                println!("{:?}\n", i.trim_left_matches("str"));
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 [package]
-name = "studyRust"
+name = "study_rust"
 version = "0.1.0"
 authors = ["wf"]
 edition = "2018"
