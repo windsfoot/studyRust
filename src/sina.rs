@@ -1,6 +1,7 @@
 //从新浪获取行情数据
 pub mod sina {
     use futures;
+    use std::fs;
     use std::time;
 
     //常量
@@ -98,17 +99,19 @@ pub mod sina {
         }
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
-           // loop {
-                for i in &p {
-                    futures::join!(self.get_real_q(&i));
-                }
-                std::thread::sleep(time::Duration::from_secs(1));
-        //  }
+            // loop {
+            for i in &p {
+                futures::join!(self.get_real_q(&i));
+            }
+            std::thread::sleep(time::Duration::from_secs(1));
+            //  }
         }
         pub fn to_symb(&self, text: String) {
-            let v_text:Vec<&str> = text.split("\";\n").collect();
+            let v_text: Vec<&str> = text.split(';').collect();
             for i in v_text {
-                println!("{:?}\n", i.strip_prefix("var hq_str_"));
+              //  if let Some(k) = i.strip_prefix("var hq_str_") {
+                    println!("{:?}\n", i);
+             //  }
             }
         }
     }
