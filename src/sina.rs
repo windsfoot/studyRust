@@ -4,6 +4,9 @@ pub mod sina {
     use futures;
     use futures::future;
     use futures::stream::{self, StreamExt};
+
+use std::time;
+    
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
     const SYM_VOL: u32 = 100; //全A单页股票个数
@@ -76,6 +79,7 @@ pub mod sina {
                 Err(_) => println!("ERROR downloading {}", r_dress),
             }
         }
+        //分配抓取序列
         pub fn make_dress(&self) -> Vec<String> {
             let i: usize = self.symbol.len();
             let mut r_dress: Vec<String> = Vec::new();
@@ -98,10 +102,12 @@ pub mod sina {
         }
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
-            for i in p {
-                futures::join!(self.get_real_q(&i));
+            while true {
+                for i in &p {
+                    futures::join!(self.get_real_q(&i));
+                    std::thread::sleep(time::Duration::from_secs(1));
+                }
             }
-
             println!("wait!\n");
         }
     }
