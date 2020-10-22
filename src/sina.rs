@@ -99,19 +99,19 @@ pub mod sina {
         }
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
-            // loop {
-            for i in &p {
-                futures::join!(self.get_real_q(&i));
+            loop {
+                for i in &p {
+                    futures::join!(self.get_real_q(&i));
+                }
+                std::thread::sleep(time::Duration::from_secs(1));
             }
-            std::thread::sleep(time::Duration::from_secs(1));
-            //  }
         }
         pub fn to_symb(&self, text: String) {
-            let v_text: Vec<&str> = text.split(';').collect();
+            let v_text: Vec<&str> = text.split("\";\n").collect();
             for i in v_text {
-              //  if let Some(k) = i.strip_prefix("var hq_str_") {
-                    println!("{:?}\n", i);
-             //  }
+                if let Some(k) = i.strip_prefix("var hq_str_") {
+                    println!("{:?}", k);
+                }
             }
         }
     }
