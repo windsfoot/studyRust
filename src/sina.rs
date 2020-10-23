@@ -1,7 +1,10 @@
 //从新浪获取行情数据
 pub mod sina {
     use futures;
+    use std::fs;
     use std::time;
+    use futures::executor::block_on;
+    use serde::{Serialize, Deserialize};
 
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
@@ -61,6 +64,24 @@ pub mod sina {
                         }
                     }
                     _ => {}
+                }
+            }
+        }
+        pub async fn symbol_ready(&mut self) {
+            let sy = fs::read_to_string("symbol");
+            match sy {
+                Ok(sym) => {
+                    println!("{:?}", sym);
+                }
+                Err(_) => {
+                    println!("get symbol from web.");
+                block_on(self.get_total_symbol());
+                    let mut s:String=String::new();
+                    for i in &self.symbol{
+                        s=s+&i;
+                        s=s+" ";
+                    }
+                    fs::write("symbol",s);
                 }
             }
         }
