@@ -71,7 +71,10 @@ pub mod sina {
             let sy = fs::read_to_string("symbol");
             match sy {
                 Ok(sym) => {
-                    println!("{:?}", sym);
+                    let k:Vec<&str>=sym.split(" ").collect();//);
+                    self.symbol= k.into_iter().map(|x|x.to_string()).collect();
+                   self.symbol.pop();
+                    println!("{:?}", self.symbol);
                 }
                 Err(_) => {
                     println!("get symbol from web.");
