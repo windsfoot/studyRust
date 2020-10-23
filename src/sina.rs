@@ -1,7 +1,6 @@
 //从新浪获取行情数据
 pub mod sina {
     use futures;
-    use std::fs;
     use std::time;
 
     //常量
