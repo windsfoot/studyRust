@@ -1,10 +1,11 @@
 //从新浪获取行情数据
 pub mod sina {
+    use chrono;
     use futures;
+    use futures::executor::block_on;
+    use serde::{Deserialize, Serialize};
     use std::fs;
     use std::time;
-    use futures::executor::block_on;
-    use serde::{Serialize, Deserialize};
 
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
@@ -67,24 +68,32 @@ pub mod sina {
                 }
             }
         }
+        //代码表当日网络抓取后落地。
         pub async fn symbol_ready(&mut self) {
             let sy = fs::read_to_string("symbol");
             match sy {
                 Ok(sym) => {
-                    let k:Vec<&str>=sym.split(" ").collect();//);
-                    self.symbol= k.into_iter().map(|x|x.to_string()).collect();
-                   self.symbol.pop();
-                    println!("{:?}", self.symbol);
+                    let me = fs::metadata("symbol").unwrap();
+                    let mo = me.modified();
+                    if let Ok(moo) = mo {
+                        let dt: chrono::DateTime<chrono::offset::Utc> = moo.into();
+                        println!("{:?}", dt);
+                    }
+
+                    let k: Vec<&str> = sym.split(" ").collect(); //);
+                    self.symbol = k.into_iter().map(|x| x.to_string()).collect();
+                    self.symbol.pop();
+                    // println!("{:?}", self.symbol);
                 }
                 Err(_) => {
                     println!("get symbol from web.");
-                block_on(self.get_total_symbol());
-                    let mut s:String=String::new();
-                    for i in &self.symbol{
-                        s=s+&i;
-                        s=s+" ";
+                    block_on(self.get_total_symbol());
+                    let mut s: String = String::new();
+                    for i in &self.symbol {
+                        s = s + &i;
+                        s = s + " ";
                     }
-                    fs::write("symbol",s);
+                    fs::write("symbol", s).unwrap();
                 }
             }
         }
