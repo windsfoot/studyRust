@@ -156,8 +156,6 @@ pub mod sina {
             fetches.await;
             // }
         }
-
-
         pub fn to_symb(&self, text: String) {
             let v_text: Vec<&str> = text.split("\";\n").collect();
             for i in v_text {
