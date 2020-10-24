@@ -1,13 +1,13 @@
 //从新浪获取行情数据
 pub mod sina {
     use chrono;
-    use futures;
+    //  use futures;
     use futures::executor::block_on;
+    use futures::future;
+    use futures::stream::{self, StreamExt};
     use serde::{Deserialize, Serialize};
     use std::fs;
     use std::time;
-
-    use log::{LevelFilter, Record, Level, Metadata};
 
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
@@ -55,7 +55,7 @@ pub mod sina {
 
         //获取全A代码
         pub async fn get_total_symbol_web(&mut self) {
-            println!("get symbol from web.");
+            info!("get symbol from web.");
             for i in &MKT {
                 let mut j = 1;
                 match i {
@@ -91,36 +91,23 @@ pub mod sina {
                             .as_secs();
                         let lc = chrono::Local::today().and_hms(0, 0, 1).timestamp() as u64;
                         if file_time > lc {
-                            
                             let k: Vec<&str> = sym.split(" ").collect(); //);
                             self.symbol = k.into_iter().map(|x| x.to_string()).collect();
                             self.symbol.pop();
-                            println!("The symbol file is newer,read from file.");
-                        }else{
-                            block_on(self.get_total_symbol_web()); 
+                            info!("The symbol file is newer,read from file.");
+                        } else {
+                            block_on(self.get_total_symbol_web());
                         }
                     }
-
-                    // println!("{:?}", self.symbol);
                 }
                 Err(_) => {
                     block_on(self.get_total_symbol_web());
                 }
             }
         }
-
-        //抓取实时行情
-        pub async fn get_real_q(&self, r_dress: &String) {
-            match reqwest::get(r_dress).await {
-                Ok(resp) => match resp.text().await {
-                    Ok(text) => self.to_symb(text),
-                    Err(_) => println!("ERROR reading {}", r_dress),
-                },
-                Err(_) => println!("ERROR downloading {}", r_dress),
-            }
-        }
         //分配抓取序列
         pub fn make_dress(&self) -> Vec<String> {
+            info!("生成实时行情抓取网址。");
             let i: usize = self.symbol.len();
             let mut r_dress: Vec<String> = Vec::new();
             let mut j: usize = 0; //总计数
@@ -140,20 +127,42 @@ pub mod sina {
             }
             return r_dress;
         }
-        pub async fn get_total_real_q(&self) {
-            let p = self.make_dress();
+
+        //抓取实时行情
+        pub async fn get_real_q(&self, r_dress: &String) {
             loop {
-                for i in &p {
-                    futures::join!(self.get_real_q(&i));
+                trace!("抓取行情，地址：{:?}", r_dress);
+                match reqwest::get(r_dress).await {
+                    Ok(resp) => match resp.text().await {
+                        Ok(text) => self.to_symb(text),
+                        Err(_) => println!("ERROR reading {}", r_dress),
+                    },
+                    Err(_) => println!("ERROR downloading {}", r_dress),
                 }
-                std::thread::sleep(time::Duration::from_secs(1));
+                std::thread::sleep(time::Duration::from_millis(500));
             }
         }
+
+        pub async fn get_total_real_q(&self) {
+            let p = self.make_dress();
+            //loop {
+            info!("开始抓取循环，并发数量{:?}.",p.len());
+            let fetches = futures::stream::iter(p.into_iter().map(|path| async move {
+                self.get_real_q(&path).await;
+            }))
+            .buffer_unordered(60)
+            .collect::<Vec<()>>();
+            info!("抓取实时行情");
+            fetches.await;
+            // }
+        }
+
+
         pub fn to_symb(&self, text: String) {
             let v_text: Vec<&str> = text.split("\";\n").collect();
             for i in v_text {
                 if let Some(k) = i.strip_prefix("var hq_str_") {
-                    println!("{:?}", k);
+                    trace!("解析数据{:?}", k);
                 }
             }
         }
