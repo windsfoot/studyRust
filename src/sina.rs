@@ -52,7 +52,8 @@ pub mod sina {
         }
 
         //获取全A代码
-        pub async fn get_total_symbol(&mut self) {
+        pub async fn get_total_symbol_web(&mut self) {
+            println!("get symbol from web.");
             for i in &MKT {
                 let mut j = 1;
                 match i {
@@ -67,6 +68,12 @@ pub mod sina {
                     _ => {}
                 }
             }
+            let mut s: String = String::new();
+            for i in &self.symbol {
+                s = s + &i;
+                s = s + " ";
+            }
+            fs::write("symbol", s).unwrap();
         }
         //代码表当日网络抓取后落地。
         pub async fn symbol_ready(&mut self) {
@@ -76,24 +83,26 @@ pub mod sina {
                     let me = fs::metadata("symbol").unwrap();
                     let mo = me.modified();
                     if let Ok(moo) = mo {
-                        let dt: chrono::DateTime<chrono::offset::Utc> = moo.into();
-                        println!("{:?}", dt);
+                        let file_time = moo
+                            .duration_since(time::SystemTime::UNIX_EPOCH)
+                            .unwrap()
+                            .as_secs();
+                        let lc = chrono::Local::today().and_hms(0, 0, 1).timestamp() as u64;
+                        if file_time > lc {
+                            
+                            let k: Vec<&str> = sym.split(" ").collect(); //);
+                            self.symbol = k.into_iter().map(|x| x.to_string()).collect();
+                            self.symbol.pop();
+                            println!("The symbol file is newer,read from file.");
+                        }else{
+                            block_on(self.get_total_symbol_web());
+                        }
                     }
 
-                    let k: Vec<&str> = sym.split(" ").collect(); //);
-                    self.symbol = k.into_iter().map(|x| x.to_string()).collect();
-                    self.symbol.pop();
                     // println!("{:?}", self.symbol);
                 }
                 Err(_) => {
-                    println!("get symbol from web.");
-                    block_on(self.get_total_symbol());
-                    let mut s: String = String::new();
-                    for i in &self.symbol {
-                        s = s + &i;
-                        s = s + " ";
-                    }
-                    fs::write("symbol", s).unwrap();
+                    block_on(self.get_total_symbol_web());
                 }
             }
         }
