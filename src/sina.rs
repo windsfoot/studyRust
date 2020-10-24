@@ -7,6 +7,8 @@ pub mod sina {
     use std::fs;
     use std::time;
 
+    use log::{LevelFilter, Record, Level, Metadata};
+
     //常量
     const MKT: [&str; 1] = ["hs_a"]; //["hs_a","cyb","kcb"];//定义市场名称
     const SYM_VOL: u32 = 100; //全A单页股票个数
@@ -95,7 +97,7 @@ pub mod sina {
                             self.symbol.pop();
                             println!("The symbol file is newer,read from file.");
                         }else{
-                            block_on(self.get_total_symbol_web());
+                            block_on(self.get_total_symbol_web()); 
                         }
                     }
 
