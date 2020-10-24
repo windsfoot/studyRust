@@ -4,9 +4,6 @@ use crate::sina::sina::Sina;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
-
-
-
 use tokio::runtime::Runtime;
 
  fn main() {
