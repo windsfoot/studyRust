@@ -16,7 +16,7 @@ pub mod sina {
     const R_QUA: &str = "http://hq.sinajs.cn/list=";
     //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
     const MAX_QUA: usize = 70; //实时行情单次最大股票数量
-
+    const QUA_DELAY: u64 = 900;
     //新浪行情结构
     pub struct Sina {
         pub symbol: Vec<String>,
@@ -55,7 +55,7 @@ pub mod sina {
 
         //获取全A代码
         pub async fn get_total_symbol_web(&mut self) {
-            info!("get symbol from web.");
+            info!("从网络取回股票列表。");
             for i in &MKT {
                 let mut j = 1;
                 match i {
@@ -94,7 +94,7 @@ pub mod sina {
                             let k: Vec<&str> = sym.split(" ").collect(); //);
                             self.symbol = k.into_iter().map(|x| x.to_string()).collect();
                             self.symbol.pop();
-                            info!("The symbol file is newer,read from file.");
+                            info!("当日列表文件symbol已更新，从本地读取列表。");
                         } else {
                             block_on(self.get_total_symbol_web());
                         }
@@ -139,14 +139,14 @@ pub mod sina {
                     },
                     Err(er) => error!("ERROR downloading {}", er),
                 }
-                std::thread::sleep(time::Duration::from_millis(500));
+                std::thread::sleep(time::Duration::from_millis(QUA_DELAY));
             }
         }
 
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
             //loop {
-            info!("开始抓取循环，并发数量{:?}.",p.len());
+            info!("开始抓取循环，并发数量{:?}.", p.len());
             let fetches = futures::stream::iter(p.into_iter().map(|path| async move {
                 self.get_real_q(&path).await;
             }))
