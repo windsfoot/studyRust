@@ -16,7 +16,7 @@ pub mod sina {
     const R_QUA: &str = "http://hq.sinajs.cn/list=";
     //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
     const MAX_QUA: usize = 70; //实时行情单次最大股票数量
-    const QUA_DELAY: u64 = 900;
+    const QUA_DELAY: u64 =3000;  //抓取延时，毫秒
     //新浪行情结构
     pub struct Sina {
         pub symbol: Vec<String>,
@@ -145,7 +145,6 @@ pub mod sina {
 
         pub async fn get_total_real_q(&self) {
             let p = self.make_dress();
-            //loop {
             info!("开始抓取循环，并发数量{:?}.", p.len());
             let fetches = futures::stream::iter(p.into_iter().map(|path| async move {
                 self.get_real_q(&path).await;
@@ -153,8 +152,7 @@ pub mod sina {
             .buffer_unordered(60)
             .collect::<Vec<()>>();
             info!("抓取实时行情");
-            fetches.await;
-            // }
+            fetches.await;  
         }
         pub fn to_symb(&self, text: String) {
             let v_text: Vec<&str> = text.split("\";\n").collect();
