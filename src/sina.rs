@@ -135,9 +135,9 @@ pub mod sina {
                 match reqwest::get(r_dress).await {
                     Ok(resp) => match resp.text().await {
                         Ok(text) => self.to_symb(text),
-                        Err(_) => println!("ERROR reading {}", r_dress),
+                        Err(er) => error!("ERROR reading {}", er),
                     },
-                    Err(_) => println!("ERROR downloading {}", r_dress),
+                    Err(er) => error!("ERROR downloading {}", er),
                 }
                 std::thread::sleep(time::Duration::from_millis(500));
             }
