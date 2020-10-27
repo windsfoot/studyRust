@@ -158,7 +158,7 @@ pub mod sina {
             let v_text: Vec<&str> = text.split("\";\n").collect();
             for i in v_text {
                 if let Some(k) = i.strip_prefix("var hq_str_") {
-                    trace!("解析数据{:?}", k);
+                    trace!("{:?}", k);
                 }
             }
         }
@@ -178,7 +178,7 @@ pub mod sina {
                 for b in bodies {
                     match b {
                         Ok(b) => self.to_symb(b),
-                        Err(e) => eprintln!("Got an error: {}", e),
+                        Err(e) => error!("Got an error: {}", e),
                     }
                 }
             }
