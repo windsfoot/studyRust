@@ -16,8 +16,8 @@ pub mod sina {
     const R_QUA: &str = "http://hq.sinajs.cn/list=";
     //const R_QUA1:&str="http://hq.sinajs.cn/rn=3qw0v&format=text&list=stock_sh_up_5min_20"; 5分钟涨速榜
     const MAX_QUA: usize = 70; //实时行情单次最大股票数量
-    const QUA_DELAY: u64 =3000;  //抓取延时，毫秒
-    //新浪行情结构
+    const QUA_DELAY: u64 = 3000; //抓取延时，毫秒
+                                 //新浪行情结构
     pub struct Sina {
         pub symbol: Vec<String>,
     }
@@ -149,16 +149,37 @@ pub mod sina {
             let fetches = futures::stream::iter(p.into_iter().map(|path| async move {
                 self.get_real_q(&path).await;
             }))
-            .buffer_unordered(60)
+            .buffer_unordered(1000)
             .collect::<Vec<()>>();
             info!("抓取实时行情");
-            fetches.await;  
+            fetches.await;
         }
         pub fn to_symb(&self, text: String) {
             let v_text: Vec<&str> = text.split("\";\n").collect();
             for i in v_text {
                 if let Some(k) = i.strip_prefix("var hq_str_") {
                     trace!("解析数据{:?}", k);
+                }
+            }
+        }
+        pub async fn get2(&self) {
+            let urls=self.make_dress();
+            loop {
+                info!("get once");
+                let client = reqwest::Client::new();
+                let bodies = future::join_all(urls.clone().into_iter().map(|url| {
+                    let client = &client;
+                    async move {
+                        let resp = client.get(&url).send().await?;
+                        resp.text().await
+                    }
+                }))
+                .await;
+                for b in bodies {
+                    match b {
+                        Ok(b) => self.to_symb(b),
+                        Err(e) => eprintln!("Got an error: {}", e),
+                    }
                 }
             }
         }
