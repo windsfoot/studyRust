@@ -13,7 +13,10 @@ use tokio::runtime::Runtime;
     // let mut  r = Runtime::new().unwrap();
     // r.block_on(c.symbol_ready());
     // r.block_on(c.get2());
-    let t=tdx::Tdx::new();
+    let mut t=tdx::Tdx::new();
     t.read_iday();
+    for i in &t.iday{
+        println!("{:?}",i);
+    };
 
 }
