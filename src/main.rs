@@ -14,9 +14,7 @@ use tokio::runtime::Runtime;
     // r.block_on(c.symbol_ready());
     // r.block_on(c.get2());
     let mut t=tdx::Tdx::new();
-    t.read_iday();
-    for i in &t.iday{
-        println!("{:?}",i);
-    };
+    t.read_all("D:\\new_dgzq_v6\\vipdoc\\sz\\lday");
+    println!("{:?}",t.iday);
 
 }
