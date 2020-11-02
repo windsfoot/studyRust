@@ -10,7 +10,7 @@ impl Tdx {
     pub fn new() -> Self {
         return Tdx { iday: Vec::new() };
     }
-
+//读取单个日线文件
      pub fn read_iday(&mut self, f_name: &str) {
         let mut buffer = [0u8; 4];
         let tbuf = fs::read(f_name);
@@ -44,6 +44,7 @@ impl Tdx {
 
       
     }
+//读取目录下所有文件
     pub fn read_all(&mut self, path: &str) {
         let paths = fs::read_dir(path).unwrap();
 
@@ -58,4 +59,6 @@ impl Tdx {
             
         }
     }
+
+    
 }
