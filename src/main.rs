@@ -24,5 +24,5 @@ fn main() {
     t.read_pwd();
     println!("{}", t.get_symbol());
 
-    println!("{:?}", time::SystemTime::now());
+    println!("{:?}", time::SystemTime::now().duration_since(time::SystemTime::UNIX_EPOCH).unwrap().as_secs());
 }
