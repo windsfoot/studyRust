@@ -21,8 +21,8 @@ fn main() {
     // let mut t=tdx::Tdx::new();
     // t.read_pwd();
     let mut t = dzh::Pwr::new();
-    t.read_pwd();
-    println!("{}", t.get_symbol());
+    t.read_pwr();
+    println!("{:#?}", t.get_symbol());
 
     println!("{:?}", time::SystemTime::now().duration_since(time::SystemTime::UNIX_EPOCH).unwrap().as_secs());
 }
