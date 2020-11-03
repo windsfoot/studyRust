@@ -1,6 +1,6 @@
 use reqwest;
 use std::fs;
-use encoding_rs::GBK;
+use encoding_rs::{GBK,GB18030};
 
 //大智慧除权文件读取 split.pwr
 // 除权文件网址 http://filedown.gw.com.cn/download/FIN/full_sh.FIN
@@ -35,8 +35,8 @@ impl Pwr {
         match reqwest::get(DZH_PWR_DRESS).await {
             Ok(resp) => match resp.bytes().await {
                 Ok(text) => {
-                    let (cow, encoding_used, had_errors) = GBK.decode(text.as_ref());
-                    print!("{}",cow );
+                    let (cow, encoding_used, had_errors) = GB18030.decode(text.as_ref());
+                    print!("{}",cow);
                 }
                 Err(_) => {}
             },
