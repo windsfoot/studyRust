@@ -3,6 +3,7 @@ use encoding_rs::{GB18030, GBK};
 use reqwest;
 use std::collections::BTreeMap;
 use std::fs;
+use std::str;
 
 //大智慧除权文件读取 split.pwr
 // 除权文件网址 http://filedown.gw.com.cn/download/FIN/full_sh.FIN
@@ -49,12 +50,13 @@ impl Pwr<'_> {
             let mut k = 0;
             while k < j {
                 let readbuf = self.pwrbuf.slice(p+k*120..p + 120*(k+1));
-              //  let f=&readbuf.slice(0..4);
-                //if f==&Bytes::from(&b"\xff\xff\xff\xff"[..]){
-                //    println!("{:?}",readbuf.slice(12..20));
-               // }
-               let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
-                println!("{:?}",cow.to_string());
+                let f=&readbuf.slice(0..4);
+                if f==&Bytes::from(&b"\xff\xff\xff\xff"[..]){
+                    let a=readbuf.slice(4..12);
+                    println!("{:?}",a);
+                }
+               //let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
+               // println!("{:?}",f);
                 k+=1;
             }
         } else {
