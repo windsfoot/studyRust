@@ -8,7 +8,8 @@
             "name": "(Windows) 启动",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "C:\\Users\\wf\\studyRust\\target\\debug\\study_Rust.exe",
+            "program": "C:\\Users\\office\\study_rust\\target\\debug\\study_Rust.exe",
+           
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

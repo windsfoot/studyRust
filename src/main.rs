@@ -25,4 +25,6 @@ fn main() {
     println!("{:#?}", t.get_symbol());
 
     println!("{:?}", time::SystemTime::now().duration_since(time::SystemTime::UNIX_EPOCH).unwrap().as_secs());
+    let mut  r = Runtime::new().unwrap();
+    r.block_on(t.get_pwr_web());
 }
