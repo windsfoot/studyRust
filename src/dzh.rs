@@ -1,6 +1,8 @@
+use bytes::Bytes;
+use encoding_rs::{GB18030, GBK};
 use reqwest;
+use std::collections::BTreeMap;
 use std::fs;
-use encoding_rs::{GBK,GB18030};
 
 //大智慧除权文件读取 split.pwr
 // 除权文件网址 http://filedown.gw.com.cn/download/FIN/full_sh.FIN
@@ -12,48 +14,52 @@ use encoding_rs::{GBK,GB18030};
 //
 const DZH_PWR_DRESS: &str = "http://filedown.gw.com.cn/download/PWR/full.PWR";
 #[derive(Debug)]
-pub struct Pwr {
-    symbol: String,
-    date: i32,
-    szg: i32,
-    pg: i32,
-    //pwr: &str,
+pub struct Pwr<'a> {
+    pwrmap: BTreeMap<&'a str, [i32; 4]>,
+    pwrbuf: Bytes,
 }
 
-impl Pwr {
+impl Pwr<'_> {
     //初始化
     pub fn new() -> Self {
         return Pwr {
-            symbol: "".to_string(),
-            date: 0,
-            szg: 0,
-            pg: 0,
-          //  pwr: "",
+            pwrmap: BTreeMap::new(),
+            pwrbuf: Bytes::new(),
         };
     }
-    pub async fn get_pwr_web(self) {
+    pub async fn get_pwr_web(&mut self) {
         match reqwest::get(DZH_PWR_DRESS).await {
             Ok(resp) => match resp.bytes().await {
                 Ok(text) => {
-                    let (cow, encoding_used, had_errors) = GB18030.decode(text.as_ref());
-                    print!("{}",cow);
+                    self.pwrbuf = text;
+                    //   let (cow, encoding_used, errors) = GB18030.decode(self.pwrbuf.as_ref());
+                    //  println!("{:?}{:?}",encoding_used,errors);
                 }
                 Err(_) => {}
             },
             Err(_) => {}
         }
     }
-    pub fn read_pwr(&mut self) {
-        let mut p = 12;
-        let pwrbuf = fs::read("split.pwr").unwrap();
+    pub fn parse_pwr(&mut self) {
+        let mut p = 8;
 
-        self.symbol = std::str::from_utf8(&pwrbuf[p..p + 8]).unwrap().to_string();
-        p += 16;
-        self.date = i32::from_le_bytes([pwrbuf[p], pwrbuf[p + 1], pwrbuf[p + 2], pwrbuf[p + 3]]);
-        p += 4;
-        self.date = i32::from_le_bytes([pwrbuf[p], pwrbuf[p + 1], pwrbuf[p + 2], pwrbuf[p + 3]]);
-        p += 4;
-        self.pg = i32::from_le_bytes([pwrbuf[p], pwrbuf[p + 1], pwrbuf[p + 2], pwrbuf[p + 3]]);
+        let i = self.pwrbuf.len() - 8;
+        if i % 120 == 0 {
+            let j = i / 120;
+            let mut k = 0;
+            while k < j {
+                let readbuf = self.pwrbuf.slice(p+k*120..p + 120*(k+1));
+              //  let f=&readbuf.slice(0..4);
+                //if f==&Bytes::from(&b"\xff\xff\xff\xff"[..]){
+                //    println!("{:?}",readbuf.slice(12..20));
+               // }
+               let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
+                println!("{:?}",cow.to_string());
+                k+=1;
+            }
+        } else {
+            error!("pwr文件长度有误");
+        }
     }
     pub fn get_symbol(&self) -> &Pwr {
         return &self;

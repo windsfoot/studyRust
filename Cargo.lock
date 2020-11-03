@@ -1115,6 +1115,7 @@ dependencies = [
 name = "study_rust"
 version = "0.1.0"
 dependencies = [
+ "bytes",
  "chrono",
  "encoding_rs",
  "env_logger",
