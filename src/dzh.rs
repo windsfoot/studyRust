@@ -4,6 +4,8 @@ use reqwest;
 use std::collections::BTreeMap;
 use std::fs;
 use std::str;
+use std::time;
+use chrono::{Local, DateTime, TimeZone};
 
 //大智慧除权文件读取 split.pwr
 // 除权文件网址 http://filedown.gw.com.cn/download/FIN/full_sh.FIN
@@ -16,7 +18,7 @@ use std::str;
 const DZH_PWR_DRESS: &str = "http://filedown.gw.com.cn/download/PWR/full.PWR";
 #[derive(Debug)]
 pub struct Pwr<'a> {
-    pwrmap: BTreeMap<&'a str, [i32; 4]>,
+    pwrmap: BTreeMap<&'a str, [i64; 4]>,
     pwrbuf: Bytes,
 }
 
@@ -54,6 +56,11 @@ impl Pwr<'_> {
                 if f==&Bytes::from(&b"\xff\xff\xff\xff"[..]){
                     let a=readbuf.slice(4..12);
                     println!("{:?}",a);
+                }else{
+                    let ubuf=[f.as_ref()[0],f.as_ref()[1],f.as_ref()[2],f.as_ref()[3],0,0,0,0];
+                    
+                    let dt: DateTime<Local> = Local.timestamp(i64::from_le_bytes(ubuf), 0);
+                    println!("{:?}",dt);
                 }
                //let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
                // println!("{:?}",f);
