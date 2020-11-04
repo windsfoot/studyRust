@@ -6,6 +6,7 @@ use std::fs;
 use std::str;
 use std::time;
 use chrono::{Local, DateTime, TimeZone};
+use bytes::Buf;
 
 //大智慧除权文件读取 split.pwr
 // 除权文件网址 http://filedown.gw.com.cn/download/FIN/full_sh.FIN
@@ -15,7 +16,9 @@ use chrono::{Local, DateTime, TimeZone};
 // 板块文件: http://222.73.103.181/platform/download/ABK/full.ABK
 // 板块文件: http://222.73.103.181/platform/download/ABK/inc.ABK
 //
-const DZH_PWR_DRESS: &str = "http://filedown.gw.com.cn/download/PWR/full.PWR";
+const DZH_PWR_DRESS: &str = "http://filedown.gw.com.cn/download/PWR/full_sz.PWR";
+//full_of full_sh full_so fundfull.pwr hkfull hkfull_cvb hkfull_zb
+
 #[derive(Debug)]
 pub struct Pwr<'a> {
     pwrmap: BTreeMap<&'a str, [i64; 4]>,
@@ -30,6 +33,8 @@ impl Pwr<'_> {
             pwrbuf: Bytes::new(),
         };
     }
+
+    //获取大智慧pwr文件并切头合并
     pub async fn get_pwr_web(&mut self) {
         match reqwest::get(DZH_PWR_DRESS).await {
             Ok(resp) => match resp.bytes().await {
@@ -40,7 +45,7 @@ impl Pwr<'_> {
                 }
                 Err(_) => {}
             },
-            Err(_) => {}
+            Err(er) => {error!("{}",er);}
         }
     }
     pub fn parse_pwr(&mut self) {
@@ -52,18 +57,24 @@ impl Pwr<'_> {
             let mut k = 0;
             while k < j {
                 let readbuf = self.pwrbuf.slice(p+k*120..p + 120*(k+1));
+                
                 let f=&readbuf.slice(0..4);
                 if f==&Bytes::from(&b"\xff\xff\xff\xff"[..]){
                     let a=readbuf.slice(4..12);
                     println!("{:?}",a);
                 }else{
+                    
                     let ubuf=[f.as_ref()[0],f.as_ref()[1],f.as_ref()[2],f.as_ref()[3],0,0,0,0];
                     
                     let dt: DateTime<Local> = Local.timestamp(i64::from_le_bytes(ubuf), 0);
-                    println!("{:?}",dt);
+                    let sg=readbuf.slice(4..8).get_f32_le();
+                    let pg=readbuf.slice(8..12).get_f32_le();
+                    let pgj=readbuf.slice(12..16).get_f32_le();
+                    let fh=readbuf.slice(16..20).get_f32_le();
+                    println!("日期{:?}送股{:?}配股{:?}配股价{:?}分红{:?}",dt,sg,pg,pgj,fh);
                 }
                //let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
-               // println!("{:?}",f);
+               //println!("{:?}",f);
                 k+=1;
             }
         } else {

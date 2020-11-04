@@ -21,7 +21,7 @@ fn main() {
     // let mut t=tdx::Tdx::new();
     // t.read_pwd();
     let mut t = dzh::Pwr::new();
-    println!("{:?}", time::SystemTime::now().duration_since(time::SystemTime::UNIX_EPOCH).unwrap().as_secs());
+   // println!("{:?}", time::SystemTime::now().duration_since(time::SystemTime::UNIX_EPOCH).unwrap().as_secs());
     let mut  r = Runtime::new().unwrap();
     r.block_on(t.get_pwr_web());
     t.parse_pwr();
