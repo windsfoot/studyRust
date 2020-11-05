@@ -27,12 +27,12 @@ const DZH_PWR_DRESS: [&str; 4] = [
 ];
 
 #[derive(Debug)]
-pub struct Pwr<'a> {
+pub struct Pwr{
     ///用来存储除权数据格式
-    pwrmap: BTreeMap<&'a str, [i64; 4]>,
+    pub pwrmap: BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>,
 }
 
-impl Pwr<'_> {
+impl Pwr {
     //初始化
     pub fn new() -> Self {
         return Pwr {
@@ -59,6 +59,8 @@ impl Pwr<'_> {
     pub fn parse_pwr(&mut self, pwrbuf: Bytes) {
         let p = 8;
         let i = pwrbuf.len() - p;
+        let mut symbol = String::new();
+        let mut symdata: Vec<(DateTime<Local>, f32, f32, f32, f32)> = Vec::new();
         if i % 120 == 0 {
             let j = i / 120;
             let mut k = 0;
@@ -67,8 +69,16 @@ impl Pwr<'_> {
 
                 let f = &readbuf.slice(0..4);
                 if f == &Bytes::from(&b"\xff\xff\xff\xff"[..]) {
-                    let a = readbuf.slice(4..12);
-                    println!("{:?}", a);
+                    if symdata.len()>0{
+                        self.pwrmap.insert(symbol.clone(), symdata.clone());
+                        //println!("{:?}\n",self.pwrmap);
+                    }
+                    let tmp = readbuf.slice(4..12);
+                    let a = String::from_utf8(tmp.as_ref().to_vec());
+                    match a {
+                        Ok(sy) => symbol = sy,
+                        Err(er) => error!("pwr文件中股票代码读取错误{}", er),
+                    }
                 } else {
                     let ubuf = [
                         f.as_ref()[0],
@@ -85,14 +95,17 @@ impl Pwr<'_> {
                     let pg = readbuf.slice(8..12).get_f32_le();
                     let pgj = readbuf.slice(12..16).get_f32_le();
                     let fh = readbuf.slice(16..20).get_f32_le();
-                    println!(
-                        "日期{:?}送股{:?}配股{:?}配股价{:?}分红{:?}",
-                        dt, sg, pg, pgj, fh
-                    );
+
+                    symdata.push((dt, sg, pg, pgj, fh));
+                   // println!("{:?}",symdata);
                 }
                 //let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
                 //println!("{:?}",f);
                 k += 1;
+                if k!=j {
+                    continue;
+                }
+                self.pwrmap.insert(symbol.clone(),symdata.clone());
             }
         } else {
             error!("pwr文件长度有误");
