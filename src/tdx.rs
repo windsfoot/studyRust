@@ -32,7 +32,6 @@ impl Tdx {
                         if j % 8 == 7 {
                             self.iday.push(dbuf);
                         }
-
                         dbuf = [0, 0, 0, 0, 0, 0, 0];
                     }
                     //     println!("{:?}", self.iday);
@@ -41,24 +40,15 @@ impl Tdx {
             }
             Err(er) => println!("er with {:?}", er),
         };
-
-      
     }
 //读取目录下所有文件
     pub fn read_all(&mut self, path: &str) {
         let paths = fs::read_dir(path).unwrap();
-
         for path in paths {
             if let Some(e) = path.unwrap().path().to_str(){
          //   println!("{:?}",e);
-            self.read_iday(e);
-       
-            }
-         
-                
-            
+            self.read_iday(e);  
+            }           
         }
     }
-
-    
 }

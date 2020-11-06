@@ -1,4 +1,6 @@
-//从新浪获取行情数据
+/*！从新浪获取行情数据
+    目前只会全市场循环刷，异步机制学完后可将各线程分开独立循环刷
+*/
 pub mod sina {
     use chrono;
     //  use futures;
@@ -29,11 +31,13 @@ pub mod sina {
             return Sina { symbol: vec![] };
         }
 
-        //抓取代码的链接控制
-        pub fn set_dress(&mut self, x: i32, y: u32, z: &str) -> String {
+        ///抓取代码的链接控制
+        ///fn set_dress(&mut self, x: i32, y: u32, z: &str) -> String   x:页数 y：每页数量 z：市场名
+        fn set_dress(&mut self, x: i32, y: u32, z: &str) -> String {
             return format!("http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page={}&num={}&sort=symbol&asc=1&node={}&_s_r_a=init",x,y,z);
         }
-        //抓取代码表
+
+        ///抓取代码表
         async fn get_symbol(&mut self, dress: String) {
             match reqwest::get(&dress).await {
                 Ok(resp) => match resp.text().await {
@@ -53,8 +57,8 @@ pub mod sina {
             }
         }
 
-        //获取全A代码
-        pub async fn get_total_symbol_web(&mut self) {
+        ///获取全A代码
+        async fn get_total_symbol_web(&mut self) {
             info!("从网络取回股票列表。");
             for i in &MKT {
                 let mut j = 1;
@@ -77,7 +81,8 @@ pub mod sina {
             }
             fs::write("symbol", s).unwrap();
         }
-        //代码表当日网络抓取后落地。
+
+        ///代码表当日网络比较抓取后落地。
         pub async fn symbol_ready(&mut self) {
             let sy = fs::read_to_string("symbol");
             match sy {
@@ -105,8 +110,9 @@ pub mod sina {
                 }
             }
         }
+
         //分配抓取序列
-        pub fn make_dress(&self) -> Vec<String> {
+        fn make_dress(&self) -> Vec<String> {
             info!("生成实时行情抓取网址。");
             let i: usize = self.symbol.len();
             let mut r_dress: Vec<String> = Vec::new();
@@ -128,42 +134,20 @@ pub mod sina {
             return r_dress;
         }
 
-        //抓取实时行情
-        pub async fn get_real_q(&self, r_dress: &String) {
-            loop {
-                trace!("抓取行情，地址：{:?}", r_dress);
-                match reqwest::get(r_dress).await {
-                    Ok(resp) => match resp.text().await {
-                        Ok(text) => self.to_symb(text),
-                        Err(er) => error!("ERROR reading {}", er),
-                    },
-                    Err(er) => error!("ERROR downloading {}", er),
-                }
-                std::thread::sleep(time::Duration::from_millis(QUA_DELAY));
-            }
-        }
-
-        pub async fn get_total_real_q(&self) {
-            let p = self.make_dress();
-            info!("开始抓取循环，并发数量{:?}.", p.len());
-            let fetches = futures::stream::iter(p.into_iter().map(|path| async move {
-                self.get_real_q(&path).await;
-            }))
-            .buffer_unordered(1000)
-            .collect::<Vec<()>>();
-            info!("抓取实时行情");
-            fetches.await;
-        }
-        pub fn to_symb(&self, text: String) {
+        ///解析抓回的数据
+        ///to_symb(&self, text: String)
+        fn to_symb(&self, text: String) {
             let v_text: Vec<&str> = text.split("\";\n").collect();
             for i in v_text {
                 if let Some(k) = i.strip_prefix("var hq_str_") {
-                    trace!("{:?}", k);
+                    println!("{:?}", k);
                 }
             }
         }
-        pub async fn get2(&self) {
-            let urls=self.make_dress();
+
+        ///抓取实时行情
+        pub async fn get_total_realq(&self) {
+            let urls = self.make_dress();
             loop {
                 info!("get once");
                 let client = reqwest::Client::new();
@@ -181,31 +165,8 @@ pub mod sina {
                         Err(e) => error!("Got an error: {}", e),
                     }
                 }
+                std::thread::sleep(time::Duration::from_millis(QUA_DELAY));
             }
         }
     }
-
-    //定义新浪行情数据
-    // // ///struct Symb {
-    // //     symbol: String,
-    // //     code: String,
-    // //     name: String,
-    // //     trade: f32,
-    // //     pricechange: f32,
-    // //     changepercent: f32,
-    // //     buy: f32,
-    // /    sell: f32,
-    //     settlement: f32,
-    //     open: f32,
-    //     high: f32,
-    //     low: f32,
-    //     volume: f64,
-    //     amount: f64,
-    //     ticktime: String,
-    //     per: f32,
-    //     pb: f32,
-    //     mktcap: f64,
-    //     nmc: f64,
-    //     turnoverratio: f64,
-    // }
 }

@@ -1,3 +1,15 @@
+/*!
+    从大智慧网站上下载pwr除权文件，解析至btree结构中
+    BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>
+            <代码,   数组<(日期，           送股，配股，配股价，分红)>>
+
+
+# Examples
+
+
+
+*/
+
 use bytes::{Buf, Bytes};
 use chrono::{DateTime, Local, TimeZone};
 use encoding_rs::{GB18030, GBK};
@@ -22,12 +34,12 @@ use tokio::runtime::Runtime;
 const DZH_PWR_DRESS: [&str; 2] = [
     "http://filedown.gw.com.cn/download/PWR/full_sz.PWR",
     "http://filedown.gw.com.cn/download/PWR/full_sh.PWR",
-   // "http://filedown.gw.com.cn/download/PWR/full_of.PWR",
-   // "http://filedown.gw.com.cn/download/PWR/full_so.PWR",
+    // "http://filedown.gw.com.cn/download/PWR/full_of.PWR",
+    // "http://filedown.gw.com.cn/download/PWR/full_so.PWR",
 ];
 
 #[derive(Debug)]
-pub struct Pwr{
+pub struct Pwr {
     ///用来存储除权数据格式
     pub pwrmap: BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>,
 }
@@ -40,7 +52,7 @@ impl Pwr {
         };
     }
 
-    //获取大智慧pwr文件
+    ///获取大智慧pwr文件
     pub async fn get_pwr_web(&mut self, dress: &str) -> Result<Bytes, &'static str> {
         match reqwest::get(dress).await {
             Ok(resp) => match resp.bytes().await {
@@ -56,6 +68,8 @@ impl Pwr {
             }
         }
     }
+
+    ///解析pwr文件，push至pwrmap：btree
     pub fn parse_pwr(&mut self, pwrbuf: Bytes) {
         let p = 8;
         let i = pwrbuf.len() - p;
@@ -66,13 +80,11 @@ impl Pwr {
             let mut k = 0;
             while k < j {
                 let readbuf = pwrbuf.slice(p + k * 120..p + 120 * (k + 1));
-
                 let f = &readbuf.slice(0..4);
                 if f == &Bytes::from(&b"\xff\xff\xff\xff"[..]) {
-                    if symdata.len()>0{
+                    if symdata.len() > 0 {
                         self.pwrmap.insert(symbol.clone(), symdata.clone());
                         symdata.clear();
-                        //println!("{:?}\n",self.pwrmap);
                     }
                     let tmp = readbuf.slice(4..12);
                     let a = String::from_utf8(tmp.as_ref().to_vec());
@@ -96,17 +108,13 @@ impl Pwr {
                     let pg = readbuf.slice(8..12).get_f32_le();
                     let pgj = readbuf.slice(12..16).get_f32_le();
                     let fh = readbuf.slice(16..20).get_f32_le();
-
                     symdata.push((dt, sg, pg, pgj, fh));
-                   // println!("{:?}",symdata);
                 }
-                //let (cow, encoding_used, errors) = GB18030.decode(readbuf.as_ref());
-                //println!("{:?}",f);
                 k += 1;
-                if k!=j {
+                if k != j {
                     continue;
                 }
-                self.pwrmap.insert(symbol.clone(),symdata.clone());
+                self.pwrmap.insert(symbol.clone(), symdata.clone());
             }
         } else {
             error!("pwr文件长度有误");

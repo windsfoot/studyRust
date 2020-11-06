@@ -11,28 +11,23 @@ use std::time;
 use tokio::runtime::Runtime;
 
 fn main() {
-  mylog::init_log();
-  // let mut c: Sina = Sina::new();
-  // let mut  r = Runtime::new().unwrap();
-  // r.block_on(c.symbol_ready());
-  // r.block_on(c.get2());
-  // let mut t=tdx::Tdx::new();
-  // t.read_all("D:\\new_dgzq_v6\\vipdoc\\sz\\lday");
-  // println!("{:?}",t.iday);
-  // let mut t=tdx::Tdx::new();
-  // t.read_pwd();
-  let mut t = dzh::Pwr::new();
-  // println!("{:?}", time::SystemTime::now().duration_since(time::SystemTime::UNIX_EPOCH).unwrap().as_secs());
-  //let mut  r = Runtime::new().unwrap();
+    mylog::init_log();
+     let mut c: Sina = Sina::new();
+     let mut  r = Runtime::new().unwrap();
+     r.block_on(c.symbol_ready());
+     r.block_on(c.get_total_realq());
 
-  // let by = r.block_on(t.get_pwr_web("http://filedown.gw.com.cn/download/PWR/full_sz.PWR"));
-  //match by {
-  //  Ok(b) => println!("{:?}", b.as_ref()),
-  //  Err(_) => {}
-  // }
-  // println!("{:?}",t);
-  t.getpwr();
-  for i in t.pwrmap {
-    println!("###{:?}\n", i);
-  }
+    /*读取通达信日线
+     let mut t=tdx::Tdx::new();
+     t.read_all("D:\\new_dgzq_v6\\vipdoc\\sz\\lday");
+     println!("{:?}",t.iday);
+  */
+
+    //读取除权信息
+    /*
+    let mut t = dzh::Pwr::new();
+    t.getpwr();
+    for i in t.pwrmap {
+      println!("###{:?}\n", i);
+    }*/
 }
