@@ -1,5 +1,7 @@
 
-
+/*!
+    日志模块 trace info error debug四种控制  
+*/
 use std::env;
 use log;
 use env_logger;

@@ -1,11 +1,12 @@
-/*！从新浪获取行情数据
+/*!
+    从新浪获取行情数据
     目前只会全市场循环刷，异步机制学完后可将各线程分开独立循环刷
 */
 pub mod sina {
     use chrono;
     //  use futures;
     use futures::executor::block_on;
-    use futures::future;
+    use futures::future; 
     use futures::stream::{self, StreamExt};
     use serde::{Deserialize, Serialize};
     use std::fs;

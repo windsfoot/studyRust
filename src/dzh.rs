@@ -1,13 +1,7 @@
 /*!
-    从大智慧网站上下载pwr除权文件，解析至btree结构中
-    BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>
-            <代码,   数组<(日期，           送股，配股，配股价，分红)>>
-
-
-# Examples
-
-
-
+    从大智慧网站上下载pwr除权文件，解析至btree结构中  
+    BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>  
+            <代码,   数组<(日期，           送股,配股,配股价,分红)>>  
 */
 
 use bytes::{Buf, Bytes};

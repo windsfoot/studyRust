@@ -1,3 +1,7 @@
+/*!
+    通达信日线数据解析  
+*/
+
 use std::io::prelude::*;
 use std::mem;
 use std::path::PathBuf;
