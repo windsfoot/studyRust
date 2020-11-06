@@ -19,11 +19,11 @@ use tokio::runtime::Runtime;
 //"http://filedown.gw.com.cn/download/PWR/fundfull.PWR",基金格式不同，以后再解析
 //full_of full_sh full_so fundfull.pwr hkfull hkfull_cvb hkfull_zb
 ///
-const DZH_PWR_DRESS: [&str; 4] = [
+const DZH_PWR_DRESS: [&str; 2] = [
     "http://filedown.gw.com.cn/download/PWR/full_sz.PWR",
     "http://filedown.gw.com.cn/download/PWR/full_sh.PWR",
-    "http://filedown.gw.com.cn/download/PWR/full_of.PWR",
-    "http://filedown.gw.com.cn/download/PWR/full_so.PWR",
+   // "http://filedown.gw.com.cn/download/PWR/full_of.PWR",
+   // "http://filedown.gw.com.cn/download/PWR/full_so.PWR",
 ];
 
 #[derive(Debug)]
@@ -71,6 +71,7 @@ impl Pwr {
                 if f == &Bytes::from(&b"\xff\xff\xff\xff"[..]) {
                     if symdata.len()>0{
                         self.pwrmap.insert(symbol.clone(), symdata.clone());
+                        symdata.clear();
                         //println!("{:?}\n",self.pwrmap);
                     }
                     let tmp = readbuf.slice(4..12);
