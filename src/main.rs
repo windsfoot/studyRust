@@ -12,16 +12,20 @@ use tokio::runtime::Runtime;
 
 fn main() {
     mylog::init_log();
+    /*
      let mut c: Sina = Sina::new();
      let mut  r = Runtime::new().unwrap();
      r.block_on(c.symbol_ready());
      r.block_on(c.get_total_realq());
-
-    /*读取通达信日线
+*/
+   // /*读取通达信日线
      let mut t=tdx::Tdx::new();
      t.read_all("D:\\new_dgzq_v6\\vipdoc\\sz\\lday");
-     println!("{:?}",t.iday);
-  */
+    for i in t.total_iday{
+      println!("!!{:?}",i);
+      break;
+    }
+ // */
 
     //读取除权信息
     /*
@@ -29,5 +33,6 @@ fn main() {
     t.getpwr();
     for i in t.pwrmap {
       println!("###{:?}\n", i);
-    }*/
+    }
+    */
 }

@@ -1,11 +1,16 @@
 /*!
     从大智慧网站上下载pwr除权文件，解析至btree结构中  
-    BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>  
+    BTreeMap<String, Vec<(Date<Local>, f32, f32, f32, f32)>>  
             <代码,   数组<(日期，           送股,配股,配股价,分红)>>  
+           ("SZ000408", [(1997-05-16+08:00, 0.1, 0.0, 0.0, 0.0), (1997-09-09+08:00, 0.6, 0.0, 0.0, 0.0), 
+           (1997-12-11+08:00, 0.0, 0.17045, 7.0, 0.0), (2000-08-15+08:00, 0.0, 0.0, 0.0, 0.3), 
+           (2001-03-01+08:00, 0.0, 0.3, 12.0, 0.0), (2002-08-29+08:00, 0.0, 0.0, 0.0, 0.02), 
+           (2006-07-03+08:00, 0.625, 0.0, 0.0, 0.0), (2008-05-30+08:00, 0.8, 0.0, 0.0, 0.0), 
+           (2017-11-14+08:00, 0.0, 0.0, 0.0, 0.3)])
 */
 
 use bytes::{Buf, Bytes};
-use chrono::{DateTime, Local, TimeZone};
+use chrono::{DateTime, Local, TimeZone,Date};
 use encoding_rs::{GB18030, GBK};
 use futures::executor::block_on;
 use reqwest;
@@ -35,7 +40,7 @@ const DZH_PWR_DRESS: [&str; 2] = [
 #[derive(Debug)]
 pub struct Pwr {
     ///用来存储除权数据格式
-    pub pwrmap: BTreeMap<String, Vec<(DateTime<Local>, f32, f32, f32, f32)>>,
+    pub pwrmap: BTreeMap<String, Vec<(Date<Local>, f32, f32, f32, f32)>>,
 }
 
 impl Pwr {
@@ -68,7 +73,7 @@ impl Pwr {
         let p = 8;
         let i = pwrbuf.len() - p;
         let mut symbol = String::new();
-        let mut symdata: Vec<(DateTime<Local>, f32, f32, f32, f32)> = Vec::new();
+        let mut symdata: Vec<(Date<Local>, f32, f32, f32, f32)> = Vec::new();
         if i % 120 == 0 {
             let j = i / 120;
             let mut k = 0;
@@ -97,7 +102,7 @@ impl Pwr {
                         0,
                         0,
                     ];
-                    let dt: DateTime<Local> = Local.timestamp(i64::from_le_bytes(ubuf), 0);
+                    let dt = Local.timestamp(i64::from_le_bytes(ubuf), 0).date();
                     let sg = readbuf.slice(4..8).get_f32_le();
                     let pg = readbuf.slice(8..12).get_f32_le();
                     let pgj = readbuf.slice(12..16).get_f32_le();
@@ -125,6 +130,7 @@ impl Pwr {
     }
 
     pub fn get_symbol(&self) -> &Pwr {
+        
         return &self;
     }
 }
