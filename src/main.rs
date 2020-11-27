@@ -20,8 +20,8 @@ fn main() {
          r.block_on(c.get_total_realq());
     */
      ///读取通达信日线
-        let mut t=tdx::Tdx::new();
-        t.read_all("C:\\Program Files (x86)\\通达信金融终端\\vipdoc\\sh\\lday");
+    //    let mut t=tdx::Tdx::new();
+      //  t.read_all("C:\\Program Files (x86)\\通达信金融终端\\vipdoc\\sh\\lday");
     //   for i in t.total_iday{
     //     println!("!!{:?}",i.0);
          
@@ -38,6 +38,7 @@ fn main() {
     for i in t.pwrmap {
         println!("{:?}\n", i);
     }*/
-   let xgb = xuangubao::XuanGuBao::new();
+   let mut xgb = xuangubao::XuanGuBao::new();
     xgb.get();
+    //xgb.ToMap();
 }

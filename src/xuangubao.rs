@@ -5,36 +5,56 @@
 use chrono::{Date, DateTime, Local, TimeZone};
 
 use reqwest;
+use serde::{Deserialize, Serialize};
+use serde_json::{self, Value};
 use std::collections::BTreeMap;
-use serde_json;
 
 const HTTP: &str =
     "https://flash-api.xuangubao.cn/api/market_indicator/line?fields=market_temperature";
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Sdata {
+    market_temperature: f64,
+    timestamp: i64,
+}
+#[derive(Debug, Serialize, Deserialize)]
+struct XGBTemp {
+    code: u64,
+    message: String,
+    data: Vec<Sdata>,
+}
 pub struct XuanGuBao {
-    temp: BTreeMap<Date<Local>, f32>,
+    temp: BTreeMap<DateTime<Local>, f64>,
+    temperature:Vec<Sdata>,
 }
 
 impl XuanGuBao {
     pub fn new() -> Self {
         return XuanGuBao {
             temp: BTreeMap::new(),
+            temperature:vec![],
         };
     }
-    pub fn get(&self) {
+    pub fn get(& mut self) {
         let body = reqwest::blocking::get(HTTP);
         match body {
             Ok(text) => {
-                let t=text.text().unwrap();
-                let t:serde_json::Value=serde_json::from_str(&t).unwrap();
-                let p=&t["data"];
-                //for i in p {
-                    println!("{:?}",p);
-                //}
+                let t = text.text().unwrap();
+                let t:XGBTemp=serde_json::from_str(&t).unwrap();
+                self.temperature=t.data;
                 
-
-            },
+            }
             Err(_) => error!("选股宝网站错误！"),
         }
+        println!("{:?}",self.temperature);
     }
+    pub fn ToMap(& mut self){
+        for i in &self.temperature{
+            let d=i.timestamp;
+            let dat=Local.timestamp(d, 0);
+            self.temp.insert(dat,i.market_temperature);
+        }
+        println!("{:?}",self.temp);
+    }
+
 }
