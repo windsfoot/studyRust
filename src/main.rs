@@ -19,14 +19,17 @@ fn main() {
          r.block_on(c.symbol_ready());
          r.block_on(c.get_total_realq());
     */
-    /* 读取通达信日线
+     ///读取通达信日线
         let mut t=tdx::Tdx::new();
-        t.read_all("D:\\new_dgzq_v6\\vipdoc\\sz\\lday");
-       for i in t.total_iday{
-         println!("!!{:?}",i);
-         break;
-       }
-    */
+        t.read_all("C:\\Program Files (x86)\\通达信金融终端\\vipdoc\\sh\\lday");
+    //   for i in t.total_iday{
+    //     println!("!!{:?}",i.0);
+         
+     //  }
+   //  let b=t.total_iday.get("sh510500.day");
+   // for j in b{
+   //   println!("{:?}\n",j);
+   // }
 
     //读取除权信息
 
@@ -35,6 +38,6 @@ fn main() {
     for i in t.pwrmap {
         println!("{:?}\n", i);
     }*/
-    let xgb = xuangubao::XuanGuBao::new();
+   let xgb = xuangubao::XuanGuBao::new();
     xgb.get();
 }
