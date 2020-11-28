@@ -39,6 +39,7 @@ fn main() {
         println!("{:?}\n", i);
     }*/
    let mut xgb = xuangubao::XuanGuBao::new();
-    xgb.get();
+    xgb.GetFromWeb();
     //xgb.ToMap();
+    xgb.ToSled();
 }
