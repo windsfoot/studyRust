@@ -66,9 +66,9 @@ impl XuanGuBao {
                    let k=i.market_temperature.to_le_bytes();
                     db.insert(i.timestamp.to_le_bytes(), &k);
                 }
-                for i in db.into_iter(){
-                   // println!("{:?}",i);
-                }
+                //for i in db.into_iter(){
+                    println!("{:?}",db.len());
+               // }
             }
             Err(_) => error!("open TemPath error!"),
         }
