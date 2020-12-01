@@ -42,4 +42,5 @@ fn main() {
     xgb.GetFromWeb();
     //xgb.ToMap();
     xgb.ToSled();
+    xgb.ToMap();
 }

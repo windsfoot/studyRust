@@ -54,7 +54,10 @@ impl XuanGuBao {
             let dat = Local.timestamp(d, 0);
             self.temp.insert(dat, i.market_temperature);
         }
-       // println!("{:?}", self.temp);
+        for i in &self.temp{
+            println!("{:?}", i);
+        }
+      
     }
     pub fn ToSled(&self) {
         match sled::open(TemPath) {
@@ -64,7 +67,7 @@ impl XuanGuBao {
                     db.insert(i.timestamp.to_le_bytes(), &k);
                 }
                 for i in db.into_iter(){
-                    println!("{:?}",i);
+                   // println!("{:?}",i);
                 }
             }
             Err(_) => error!("open TemPath error!"),
