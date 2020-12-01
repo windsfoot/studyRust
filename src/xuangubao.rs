@@ -59,16 +59,30 @@ impl XuanGuBao {
         }
       
     }
-    pub fn ToSled(&self) {
+    pub fn ToSled(& mut self) {
         match sled::open(TemPath) {
             Ok(db) => {
                 for i in &self.temperature {
                    let k=i.market_temperature.to_le_bytes();
                     db.insert(i.timestamp.to_le_bytes(), &k);
                 }
-                //for i in db.into_iter(){
-                    println!("{:?}",db.len());
-               // }
+                self.temp.clear();
+                for i in db.iter(){
+                   
+                    match i{
+                        Ok(j)=>{
+                            
+                            let k=j.0.as_ref();
+                            let v=j.1.as_ref();
+                          
+                            let tim= i64::from_le_bytes([k[0],k[1],k[2],k[3],k[4],k[5],k[6],k[7]]);
+                            let tem= f64::from_le_bytes([v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7]]);
+                            let dt=Local.timestamp(tim,0);
+                            self.temp.insert(dt, tem);
+                        },
+                        Err(_)=>{},
+                    }
+                }
             }
             Err(_) => error!("open TemPath error!"),
         }
